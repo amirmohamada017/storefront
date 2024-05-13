@@ -1,11 +1,19 @@
 from django.db import models
+from django.core.validators import MinValueValidator
 
 
 class Collection(models.Model):
     title = models.CharField(max_length=255)
-    featured_product = models.ForeignKey(
-        'Product', on_delete=models.SET_NULL, null=True, related_name='+'
+    products = models.ForeignKey(
+        'Product',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='+'
     )
+
+    def __str__(self) -> str:
+        return self.title
 
 
 class Promotion(models.Model):
@@ -16,12 +24,16 @@ class Promotion(models.Model):
 class Product(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(default='-')
-    description = models.TextField()
-    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField(null=True, blank=True)
     inventory = models.IntegerField()
     last_update = models.DateTimeField(auto_now=True)
     collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
-    promotions = models.ManyToManyField(Promotion)
+    promotions = models.ManyToManyField(Promotion, blank=True)
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2,
+                                     validators=[MinValueValidator(1)])
+
+    def __str__(self) -> str:
+        return self.title
 
 
 class Customer(models.Model):
@@ -44,6 +56,12 @@ class Customer(models.Model):
         choices=MEMBERSHIP_CHOICES
     )
 
+    def __str__(self) -> str:
+        return f'{self.first_name} {self.last_name}'
+
+    class Meta:
+        ordering = ['first_name', 'last_name']
+
 
 class Order(models.Model):
     PAYMENT_STATUS_PENDING = 'P'
@@ -55,7 +73,7 @@ class Order(models.Model):
         (PAYMENT_STATUS_FAILED, 'Failed')
     )
     placed_at = models.DateTimeField(auto_now_add=True)
-    costumer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+    customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
     payment_status = models.CharField(
         max_length=1,
         default=PAYMENT_STATUS_PENDING,
