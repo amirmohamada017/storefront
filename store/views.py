@@ -6,11 +6,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import Product, Collection, OrderItem, Review
 from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer
 from .filters import ProductFilter
+from .pagination import DefaultPagination
 
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    pagination_class = DefaultPagination
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
     filterset_class = ProductFilter
     search_fields = ['title', 'description']
