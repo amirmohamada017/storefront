@@ -3,9 +3,6 @@ from .models import Product
 
 
 class ProductFilter(filterset.FilterSet):
-    title = filterset.CharFilter(lookup_expr='icontains')
-    min_price = filterset.NumberFilter(field_name='unit_price', lookup_expr='gte')
-    max_price = filterset.NumberFilter(field_name='unit_price', lookup_expr='lte')
 
     class Meta:
         model = Product
