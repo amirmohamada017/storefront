@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 from datetime import timedelta
 
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
     'djoser',
     'django_filters',
     'playground',
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -124,6 +126,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -139,7 +144,7 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = 'core.User'
 
 SIMPLE_JWT = {
-    'AUTH_HEADER_TYPES': ('JWT', ),
+    'AUTH_HEADER_TYPES': ('JWT',),
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
 }
 
@@ -149,3 +154,8 @@ DJOSER = {
         'current_user': 'core.serializers.UserSerializer',
     }
 }
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8001',
+    'http://127.0.0.1:8001',
+]

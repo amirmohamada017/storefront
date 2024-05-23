@@ -14,7 +14,7 @@ from .pagination import DefaultPagination
 
 
 class ProductViewSet(ModelViewSet):
-    queryset = models.Product.objects.all()
+    queryset = models.Product.objects.prefetch_related('images').all()
     serializer_class = serializers.ProductSerializer
     pagination_class = DefaultPagination
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
@@ -137,3 +137,13 @@ class OrderViewSet(ModelViewSet):
 
         customer_id = models.Customer.objects.only('id').get(user_id=user.id)
         return models.Order.objects.filter(customer_id=customer_id)
+
+
+class ProductImageViewSet(ModelViewSet):
+    serializer_class = serializers.ProductImageSerializer
+
+    def get_queryset(self):
+        return models.ProductImage.objects.filter(product_id=self.kwargs['product_pk'])
+
+    def get_serializer_context(self):
+        return {'product_id': self.kwargs['product_pk']}

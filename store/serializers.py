@@ -12,10 +12,22 @@ class CollectionSerializer(serializers.ModelSerializer):
     products_count = serializers.IntegerField(read_only=True)
 
 
+class ProductImageSerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        product_id = self.context['product_id']
+        return models.ProductImage.objects.create(product_id=product_id, **validated_data)
+
+    class Meta:
+        model = models.ProductImage
+        fields = ['id', 'image']
+
+
 class ProductSerializer(serializers.ModelSerializer):
+    images = ProductImageSerializer(many=True)
+
     class Meta:
         model = models.Product
-        fields = ['id', 'title', 'slug', 'description', 'inventory', 'unit_price', 'collection']
+        fields = ['id', 'title', 'slug', 'description', 'inventory', 'unit_price', 'collection', 'images']
 
     collection = serializers.HyperlinkedRelatedField(
         queryset=models.Collection.objects.all(),
